@@ -2,7 +2,7 @@
 
 An educational, step-by-step visualization of the Graham Scan algorithm for computing the convex hull of a set of points.
 
-![Screenshot](https://i.imgur.complaceholder.png) <!-- Add a real screenshot -->
+
 
 ## What is this?
 
