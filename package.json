@@ -1,0 +1,8 @@
+{
+  "name": "graham-scan",
+  "version": "1.0.0",
+  "description": "Interactive Graham Scan convex hull visualizer",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
