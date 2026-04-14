@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive educational visualization of the Graham Scan algorithm for finding convex hulls. Learn step-by-step with animations, pseudocode, and explanations.">
+  <title>Graham Scan — Interactive Convex Hull Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-content">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,2 38,30 2,30" stroke="url(#logo-grad)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+            <circle cx="20" cy="2" r="3" fill="#6ee7b7"/>
+            <circle cx="38" cy="30" r="3" fill="#a78bfa"/>
+            <circle cx="2" cy="30" r="3" fill="#fbbf24"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="40" y2="40">
+                <stop offset="0%" stop-color="#6ee7b7"/>
+                <stop offset="50%" stop-color="#a78bfa"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <h1>Graham Scan</h1>
+          <p class="subtitle">Interactive Convex Hull Visualizer</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-theme-toggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <a href="https://en.wikipedia.org/wiki/Graham_scan" target="_blank" rel="noopener" class="icon-btn" title="Learn more" aria-label="Learn more on Wikipedia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main id="app-main">
+    <!-- Canvas Area -->
+    <section id="canvas-section">
+      <!-- Toolbar -->
+      <div id="toolbar">
+        <div class="toolbar-group">
+          <button id="btn-add-mode" class="tool-btn active" title="Click to add points">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/></svg>
+            <span>Add Points</span>
+          </button>
+          <button id="btn-drag-mode" class="tool-btn" title="Drag points to reposition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l-3 3-3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+            <span>Drag</span>
+          </button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+          <button id="btn-random" class="tool-btn" title="Generate random points">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg>
+            <span>Random</span>
+          </button>
+          <button id="btn-clear" class="tool-btn" title="Clear all points">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Clear</span>
+          </button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+          <label class="point-count-label">
+            Points:
+            <input type="number" id="input-point-count" value="15" min="3" max="100" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Canvas Container -->
+      <div id="canvas-container">
+        <canvas id="main-canvas"></canvas>
+        <div id="canvas-overlay" class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="32" cy="32" r="28" stroke-dasharray="4 4" opacity="0.3"/>
+              <circle cx="20" cy="40" r="3" fill="#6ee7b7" stroke="none"/>
+              <circle cx="44" cy="38" r="3" fill="#a78bfa" stroke="none"/>
+              <circle cx="32" cy="16" r="3" fill="#fbbf24" stroke="none"/>
+              <line x1="20" y1="40" x2="32" y2="16" stroke="#6ee7b7" opacity="0.4"/>
+              <line x1="32" y1="16" x2="44" y2="38" stroke="#a78bfa" opacity="0.4"/>
+              <line x1="44" y1="38" x2="20" y2="40" stroke="#fbbf24" opacity="0.4"/>
+            </svg>
+          </div>
+          <p>Click on the canvas to add points</p>
+          <p class="small">or use <strong>Random</strong> to generate a set</p>
+        </div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div id="playback-controls">
+        <div class="controls-left">
+          <button id="btn-start" class="primary-btn" title="Start simulation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Start</span>
+          </button>
+          <button id="btn-reset" class="control-btn" title="Reset simulation" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+        </div>
+        <div class="controls-center">
+          <button id="btn-prev" class="control-btn" title="Previous step" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button id="btn-play-pause" class="control-btn play-btn" title="Auto play" disabled>
+            <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <button id="btn-next" class="control-btn" title="Next step" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="controls-right">
+          <label class="speed-control" title="Animation speed">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <input type="range" id="speed-slider" min="1" max="10" value="5" />
+            <span id="speed-label">1×</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Step progress bar -->
+      <div id="step-progress">
+        <div id="step-progress-bar"></div>
+        <span id="step-counter">Step 0 / 0</span>
+      </div>
+    </section>
+
+    <!-- Side Panel -->
+    <aside id="side-panel">
+      <!-- Tabs -->
+      <div id="panel-tabs">
+        <button class="panel-tab active" data-tab="explanation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Explanation
+        </button>
+        <button class="panel-tab" data-tab="pseudocode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Pseudocode
+        </button>
+        <button class="panel-tab" data-tab="info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Concepts
+        </button>
+      </div>
+
+      <!-- Tab Content: Explanation -->
+      <div id="tab-explanation" class="tab-content active">
+        <div id="step-status" class="status-card">
+          <div class="status-badge idle">Ready</div>
+          <h2 id="step-title">Welcome!</h2>
+          <p id="step-description">Add at least 3 points to the canvas, then click <strong>Start</strong> to begin the Graham Scan algorithm visualization.</p>
+        </div>
+
+        <div id="step-details" class="details-card">
+          <h3>What is Graham Scan?</h3>
+          <p>Graham Scan is an algorithm that finds the <em>convex hull</em> — the smallest convex polygon that contains all the given points. Think of it as stretching a rubber band around all the points.</p>
+          <div class="concept-visual">
+            <div class="rubber-band-demo">
+              <div class="rb-dot" style="top:20%;left:30%"></div>
+              <div class="rb-dot" style="top:60%;left:15%"></div>
+              <div class="rb-dot" style="top:80%;left:50%"></div>
+              <div class="rb-dot" style="top:40%;left:70%"></div>
+              <div class="rb-dot" style="top:15%;left:55%"></div>
+              <div class="rb-dot interior" style="top:45%;left:45%"></div>
+              <div class="rb-dot interior" style="top:55%;left:35%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orientation visualization -->
+        <div id="orientation-display" class="details-card" style="display:none;">
+          <h3>Orientation Check</h3>
+          <div id="orientation-visual">
+            <div id="orientation-arrow"></div>
+            <span id="orientation-label"></span>
+          </div>
+          <div id="cross-product-display">
+            <span class="cp-label">Cross Product:</span>
+            <span id="cross-product-value" class="cp-value">—</span>
+          </div>
+        </div>
+
+        <!-- Stack display -->
+        <div id="stack-display" class="details-card" style="display:none;">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="4" y="2" width="16" height="5" rx="1"/><rect x="4" y="9" width="16" height="5" rx="1"/><rect x="4" y="16" width="16" height="5" rx="1"/></svg>
+            Stack
+          </h3>
+          <div id="stack-items"></div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Pseudocode -->
+      <div id="tab-pseudocode" class="tab-content">
+        <div class="pseudocode-card">
+          <h3>Graham Scan Algorithm</h3>
+          <pre id="pseudocode-block"><code><span class="pc-line" data-line="1"><span class="kw">function</span> grahamScan(points):</span>
+<span class="pc-line" data-line="2">  <span class="cm">// Step 1: Find lowest point</span></span>
+<span class="pc-line" data-line="3">  pivot ← point with min y</span>
+<span class="pc-line" data-line="4">    <span class="cm">(leftmost if tie)</span></span>
+<span class="pc-line" data-line="5"></span>
+<span class="pc-line" data-line="6">  <span class="cm">// Step 2: Sort by polar angle</span></span>
+<span class="pc-line" data-line="7">  sort points by angle w.r.t pivot</span>
+<span class="pc-line" data-line="8"></span>
+<span class="pc-line" data-line="9">  <span class="cm">// Step 3: Process each point</span></span>
+<span class="pc-line" data-line="10">  stack ← [pivot, points[1]]</span>
+<span class="pc-line" data-line="11"></span>
+<span class="pc-line" data-line="12">  <span class="kw">for</span> i ← 2 <span class="kw">to</span> n-1:</span>
+<span class="pc-line" data-line="13">    <span class="kw">while</span> ccw(top2, top, p[i]) ≤ 0:</span>
+<span class="pc-line" data-line="14">      stack.pop()</span>
+<span class="pc-line" data-line="15">    stack.push(p[i])</span>
+<span class="pc-line" data-line="16"></span>
+<span class="pc-line" data-line="17">  <span class="kw">return</span> stack <span class="cm">// convex hull</span></span></code></pre>
+        </div>
+        <div class="pseudocode-card">
+          <h3>Orientation (CCW) Test</h3>
+          <pre><code><span class="pc-line" data-line="ccw-1"><span class="kw">function</span> ccw(A, B, C):</span>
+<span class="pc-line" data-line="ccw-2">  cross = (B.x-A.x)*(C.y-A.y)</span>
+<span class="pc-line" data-line="ccw-3">        - (B.y-A.y)*(C.x-A.x)</span>
+<span class="pc-line" data-line="ccw-4">  <span class="kw">if</span> cross > 0: <span class="kw">return</span> <span class="val">LEFT TURN</span></span>
+<span class="pc-line" data-line="ccw-5">  <span class="kw">if</span> cross < 0: <span class="kw">return</span> <span class="val">RIGHT TURN</span></span>
+<span class="pc-line" data-line="ccw-6">  <span class="kw">return</span> <span class="val">COLLINEAR</span></span></code></pre>
+        </div>
+      </div>
+
+      <!-- Tab Content: Concepts -->
+      <div id="tab-info" class="tab-content">
+        <div class="info-card">
+          <h3>🎯 Key Concepts</h3>
+          <div class="concept-item">
+            <h4>Convex Hull</h4>
+            <p>The smallest convex polygon enclosing all points. Like stretching a rubber band around nails on a board.</p>
+          </div>
+          <div class="concept-item">
+            <h4>Polar Angle</h4>
+            <p>The angle formed between the positive x-axis and the line from the pivot to each point. Used to sort points counter-clockwise.</p>
+          </div>
+          <div class="concept-item">
+            <h4>Cross Product</h4>
+            <p>For vectors AB and AC: <code>(B.x−A.x)·(C.y−A.y) − (B.y−A.y)·(C.x−A.x)</code>. Positive = left turn, negative = right turn.</p>
+          </div>
+          <div class="concept-item">
+            <h4>Left Turn vs Right Turn</h4>
+            <p><strong>Left turn (CCW):</strong> The point is on the correct side — keep it on the hull.<br><strong>Right turn (CW):</strong> The previous point makes the hull concave — remove it.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <h3>⏱ Complexity</h3>
+          <table class="complexity-table">
+            <thead>
+              <tr><th>Operation</th><th>Complexity</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Find pivot</td><td><code>O(n)</code></td></tr>
+              <tr><td>Sort by angle</td><td><code>O(n log n)</code></td></tr>
+              <tr><td>Scan (stack ops)</td><td><code>O(n)</code></td></tr>
+              <tr>
+                <td><strong>Total</strong></td>
+                <td><strong><code>O(n log n)</code></strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="info-card">
+          <h3>📖 Algorithm Steps</h3>
+          <ol class="steps-list">
+            <li><strong>Find the pivot:</strong> The bottommost (lowest y) point. If there's a tie, pick the leftmost.</li>
+            <li><strong>Sort points:</strong> Order all other points by polar angle relative to the pivot.</li>
+            <li><strong>Initialize stack:</strong> Push the pivot and the first sorted point.</li>
+            <li><strong>Process each point:</strong> For each remaining point, check orientation with the top two stack points.</li>
+            <li><strong>Adjust hull:</strong> Pop from the stack while a right turn (clockwise) is detected.</li>
+            <li><strong>Complete:</strong> The stack contains the convex hull vertices in counter-clockwise order.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div id="legend">
+        <h4>Legend</h4>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-dot unprocessed"></span>
+            <span>Unprocessed Point</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot pivot"></span>
+            <span>Pivot (Lowest Point)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot current"></span>
+            <span>Current Point</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot hull"></span>
+            <span>On Hull (Stack)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot rejected"></span>
+            <span>Rejected (Popped)</span>
+          </div>
+          <div class="legend-line hull-line"></div>
+          <div class="legend-item">
+            <span>Hull Edge</span>
+          </div>
+          <div class="legend-line check-line"></div>
+          <div class="legend-item">
+            <span>Checking Edge</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="graham.js"></script>
+  <script src="renderer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
